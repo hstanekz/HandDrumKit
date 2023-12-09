@@ -1,20 +1,26 @@
-<ion-header [translucent]="true">
+<ion-header>
   <ion-toolbar>
     <ion-title>
-      Blank
+      Drum Kit
     </ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Blank</ion-title>
-    </ion-toolbar>
-  </ion-header>
-
-  <div id="container">
-    <strong>Ready to create an app?</strong>
-    <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
+<ion-content>
+  <div class="keys">
+    <!-- Each drum key -->
+    <div *ngFor="let key of drumKeys" 
+         [attr.data-key]="key.code" 
+         class="key" 
+         (transitionend)="removeTransition($event)">
+      <kbd>{{ key.label }}</kbd>
+      <span class="sound">{{ key.sound }}</span>
+    </div>
   </div>
+
+  <!-- Audio elements for each sound -->
+  <audio *ngFor="let key of drumKeys" 
+         [attr.data-key]="key.code" 
+         [src]="key.audioSrc">
+  </audio>
 </ion-content>
