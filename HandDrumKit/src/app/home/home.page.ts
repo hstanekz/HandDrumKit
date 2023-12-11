@@ -1,5 +1,5 @@
 import { Component, ElementRef } from '@angular/core';
-import { PredictionEvent } from '../prediction-event'; // Import PredictionEvent
+import { PredictionEvent } from '../prediction-event';
 
 @Component({
   selector: 'app-home',
