@@ -1,4 +1,5 @@
-import { Component, OnInit, ElementRef, Renderer2 } from '@angular/core';
+import { Component, ElementRef } from '@angular/core';
+import { PredictionEvent } from '../prediction-event'; // Import PredictionEvent
 
 @Component({
   selector: 'app-home',
@@ -6,6 +7,11 @@ import { Component, OnInit, ElementRef, Renderer2 } from '@angular/core';
   styleUrls: ['home.page.scss'],
 })
 export class HomePage {
+
+  async canDismiss(data?: any, role?: string) {
+    return role !== 'gesture';
+  }
+
   drumKeys = [
     { code: '65', label: 'A', sound: 'clap', audioSrc: '../../assets/sounds/clap.wav' },
     { code: '83', label: 'S', sound: 'hihat', audioSrc: '../../assets/sounds/hihat.wav' },
@@ -18,28 +24,46 @@ export class HomePage {
     { code: '76', label: 'L', sound: 'tink', audioSrc: '../../assets/sounds/tink.wav' },
   ];
 
-  constructor(private el: ElementRef, private renderer: Renderer2) {}
+  constructor(private el: ElementRef) {}
 
-  ngOnInit() {
-    const keys = this.el.nativeElement.querySelectorAll('.key');
-    keys.forEach((key: any) => {
-      this.renderer.listen(key, 'transitionend', this.removeTransition);
-    });
-    this.renderer.listen('window', 'keydown', this.playSound.bind(this));
+  handleGesture(event: PredictionEvent) {
+    const gesture = event.getPrediction();
+    const keyCode = this.mapGestureToKeyCode(gesture);
+    if (keyCode) {
+      this.playSoundByKeyCode(keyCode);
+    }
   }
 
-  removeTransition(e: any) {
-    if (e.propertyName !== 'transform') return;
-    e.target.classList.remove('playing');
+  mapGestureToKeyCode(gesture: string): string | null {
+    const gestureMap: { [key: string]: string } = {
+      'One Hand Open One Hand Closed': '65', // Clap
+      'Two Open Hands': '83', // Hihat
+      'Closed Hand': '68', // Kick
+      'Two Closed Hands': '70', // Openhat
+      'Open Hand': '71', // Boom
+      'One Hand Pointing One Hand Closed': '72', // Ride
+      'Hand Pointing': '74', // Snare
+      'Hand Pinching': '75', // Tom
+      'Two Hands Pinching': '76' // Tink
+    };
+
+    return gestureMap[gesture] || null;
   }
 
-  playSound(e: any) {
-    const audio = this.el.nativeElement.querySelector(`audio[data-key="${e.keyCode}"]`);
-    const key = this.el.nativeElement.querySelector(`div[data-key="${e.keyCode}"]`);
+  playSoundByKeyCode(keyCode: string) {
+    const audio = this.el.nativeElement.querySelector(`audio[data-key="${keyCode}"]`);
+    const key = this.el.nativeElement.querySelector(`div[data-key="${keyCode}"]`);
     if (!audio) return;
 
     key.classList.add('playing');
     audio.currentTime = 0;
     audio.play();
   }
+
+
+  removeTransition(event: any) {
+  if (event.propertyName !== 'transform') return;
+  event.target.classList.remove('playing');
+}
+
 }

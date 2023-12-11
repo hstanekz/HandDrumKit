@@ -1,12 +1,15 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>
-      Drum Kit
-    </ion-title>
+    <ion-title>Drum Kit</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
+  <!-- Handtracker Component for gesture detection -->
+
+  <app-handtracker (onPrediction)="handleGesture($event)"></app-handtracker>
+
+
   <div class="keys">
     <!-- Each drum key -->
     <div *ngFor="let key of drumKeys" 
